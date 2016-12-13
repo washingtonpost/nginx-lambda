@@ -14,12 +14,14 @@ static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *r);
  */
 static ngx_command_t ngx_http_lambda_commands[] = {
 
-    { ngx_string("lambda"), /* directive */
-      NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1, /* location context and takes 1 argument the lambda function ARN*/
+    { 
+      ngx_string("lambda"), /* directive */
+      NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1, /* location context and takes 1 argument the lambda function ARN */
       ngx_http_lambda, /* configuration setup function */
       0, /* No offset. Only one context is supported. */
       0, /* No offset when storing the module configuration on struct. */
-      NULL},
+      NULL
+    },
 
     ngx_null_command /* command termination */
 };
@@ -65,35 +67,35 @@ ngx_module_t ngx_http_lambda_module = {
  * @return
  *   The status of the response generation.
  */
-static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *r)
+static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *req)
 {
-    ngx_buf_t *b;
+    ngx_buf_t *buf;
     ngx_chain_t out;
 
     /* Set the Content-Type header. */
-    r->headers_out.content_type.len = sizeof("text/plain") - 1;
-    r->headers_out.content_type.data = (u_char *) "text/plain";
+    req->headers_out.content_type.len = sizeof("text/html") - 1;
+    req->headers_out.content_type.data = (u_char *) "text/html";
 
     /* Allocate a new buffer for sending out the reply. */
-    b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));
+    buf = ngx_pcalloc(req->pool, sizeof(ngx_buf_t));
 
     /* Insertion in the buffer chain. */
-    out.buf = b;
+    out.buf = buf;
     out.next = NULL; /* just one buffer */
 
-    b->pos = ngx_lambda; /* first position in memory of the data */
-    b->last = ngx_lambda + sizeof(ngx_lambda); /* last position in memory of the data */
-    b->memory = 1; /* content is in read-only memory */
-    b->last_buf = 1; /* there will be no more buffers in the request */
+    buf->pos = ngx_lambda; /* first position in memory of the data */
+    buf->last = ngx_lambda + sizeof(ngx_lambda); /* last position in memory of the data */
+    buf->memory = 1; /* content is in read-only memory */
+    buf->last_buf = 1; /* there will be no more buffers in the request */
 
     /* Sending the headers for the reply. */
-    r->headers_out.status = NGX_HTTP_OK; /* 200 status code */
+    req->headers_out.status = NGX_HTTP_OK; /* 200 status code */
     /* Get the content length of the body. */
-    r->headers_out.content_length_n = sizeof(ngx_lambda);
-    ngx_http_send_header(r); /* Send the headers */
+    req->headers_out.content_length_n = sizeof(ngx_lambda);
+    ngx_http_send_header(req); /* Send the headers */
 
     /* Send the body, and return the status code of the output filter chain. */
-    return ngx_http_output_filter(r, &out);
+    return ngx_http_output_filter(req, &out);
 }
 
 /**
