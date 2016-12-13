@@ -2,11 +2,8 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
-
-#define HELLO_WORLD "hello world"
-
 static char *ngx_http_lambda(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *r);
+static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *req);
 
 /**
  * This module provided directive: lambda.
@@ -25,8 +22,6 @@ static ngx_command_t ngx_http_lambda_commands[] = {
 
     ngx_null_command /* command termination */
 };
-
-static u_char ngx_lambda[] = HELLO_WORLD;
 
 /* The module context. */
 static ngx_http_module_t ngx_http_lambda_module_ctx = {
@@ -58,6 +53,31 @@ ngx_module_t ngx_http_lambda_module = {
     NULL, /* exit master */
     NGX_MODULE_V1_PADDING
 };
+
+/**
+ * Configuration setup function that installs the content handler.
+ *
+ * @param cf
+ *   Module configuration structure pointer.
+ * @param cmd
+ *   Module directives structure pointer.
+ * @param conf
+ *   Module configuration structure pointer.
+ * @return string
+ *   Status of the configuration setup.
+ */
+static char *ngx_http_lambda(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_core_loc_conf_t *clcf; /* pointer to core location configuration */
+
+    /* Install the handler. */
+    clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+    clcf->handler = ngx_http_lambda_handler;
+
+    return NGX_CONF_OK;
+} 
+
+static u_char ngx_lambda[] = "hello world";
 
 /**
  * Content handler.
@@ -97,26 +117,3 @@ static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *req)
     /* Send the body, and return the status code of the output filter chain. */
     return ngx_http_output_filter(req, &out);
 }
-
-/**
- * Configuration setup function that installs the content handler.
- *
- * @param cf
- *   Module configuration structure pointer.
- * @param cmd
- *   Module directives structure pointer.
- * @param conf
- *   Module configuration structure pointer.
- * @return string
- *   Status of the configuration setup.
- */
-static char *ngx_http_lambda(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
-{
-    ngx_http_core_loc_conf_t *clcf; /* pointer to core location configuration */
-
-    /* Install the handler. */
-    clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-    clcf->handler = ngx_http_lambda_handler;
-
-    return NGX_CONF_OK;
-} 
