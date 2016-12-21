@@ -130,7 +130,7 @@ static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *req)
     /* Sending the headers for the reply. */
     req->headers_out.status = NGX_HTTP_OK; /* 200 status code */
     /* Get the content length of the body. */
-    req->headers_out.content_length_n = sizeof(ngx_lambda_stub);
+    req->headers_out.content_length_n = sizeof(ngx_lambda_stub) - 1;
     ngx_http_send_header(req); /* Send the headers */
 
     /* Send the body, and return the status code of the output filter chain. */
