@@ -39,7 +39,7 @@ RUN cd /tmp/nginx \
 ADD src/ /tmp/nginx/modules/nginx-lambda/
 
 RUN cd /tmp/nginx \
-    && make \
+    && make -j 2 \
     && make install
 
 CMD ["nginx", "-c", "/etc/nginx/nginx.conf", "-g", "daemon off;"]

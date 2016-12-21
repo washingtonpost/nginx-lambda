@@ -106,11 +106,6 @@ static ngx_int_t ngx_http_lambda_handler(ngx_http_request_t *req)
     ngx_buf_t *buf;
     ngx_chain_t out;
 
-    /* we response to 'GET' requests only, for now */
-    if (!(req->method & NGX_HTTP_GET)) {
-        return NGX_HTTP_NOT_ALLOWED;
-    }
-
     /* Set the Content-Type header. */
     req->headers_out.content_type.len = sizeof("application/json") - 1;
     req->headers_out.content_type.data = (u_char *) "application/json";
