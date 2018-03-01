@@ -31,12 +31,10 @@ RUN wget -O /tmp/nginx.tar.gz $NGINX_URL \
     && mv /tmp/nginx* /tmp/nginx \
     && mkdir -p /tmp/nginx/modules/nginx-lambda
 
-ADD config /tmp/nginx/modules/nginx-lambda/
+ADD . /tmp/nginx/modules/nginx-lambda/
 
 RUN cd /tmp/nginx \
     && ./configure ${NGINX_OPTS}
-
-ADD src/ /tmp/nginx/modules/nginx-lambda/src/
 
 RUN cd /tmp/nginx \
     && make -j 2 \
